@@ -1,19 +1,109 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+    public void start(Stage primaryStage) throws Exception {
+        LinkedList clusterList = processClusterTxt();
         primaryStage.setTitle("A2 Task 2 -Michael Coleman");
-        primaryStage.setScene(new Scene(root, 300, 275));
+        final NumberAxis xAxis = new NumberAxis(-.5, 10, .5);
+        final NumberAxis yAxis = new NumberAxis(-.5, 10, .5);
+        final ScatterChart<Number, Number> chart;
+        chart = new ScatterChart<Number, Number>(xAxis, yAxis);
+        xAxis.setLabel("X");
+        yAxis.setLabel("Y");
+        chart.setTitle("Unique Neighborhood Set Parameter " +
+                "Independent Density-Based Clustering " +
+                "with Outlier Detection");
+        XYChart.Series cluster1 = new XYChart.Series();
+        XYChart.Series cluster2 = new XYChart.Series();
+        XYChart.Series cluster3 = new XYChart.Series();
+        XYChart.Series cluster4 = new XYChart.Series();
+        cluster1.setName("Cluster 1");
+        cluster2.setName("Cluster 2");
+        cluster3.setName("Cluster 3");
+        cluster4.setName("Cluster 4");
+        Node currentNode = clusterList.getHead();
+        while (true) {
+            if (currentNode == null) {
+                break;
+            }
+            int clusterGroup = currentNode.getClusterGroup();
+            double x = currentNode.getX();
+            double y = currentNode.getY();
+            switch (clusterGroup) {
+                case 1:
+                    cluster1.getData().add(new XYChart.Data(x, y));
+                case 2:
+                    cluster2.getData().add(new XYChart.Data(x, y));
+                case 3:
+                    cluster3.getData().add(new XYChart.Data(x, y));
+                case 4:
+                    cluster4.getData().add(new XYChart.Data(x, y));
+            }
+            currentNode = currentNode.getNextNode();
+        }
+        chart.getData().addAll(cluster1, cluster2, cluster3, cluster4);
+        Scene scene = new Scene(chart, 1000, 1000);
+        scene.getStylesheets().add("sample/Chart.css");
+        primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    public static LinkedList processClusterTxt() {
+        LinkedList clusterList = new LinkedList();
+        String pathname = "cluster.txt";
+        String thisLine = "";
+        try {
+            Scanner fileInput = new Scanner(new File(pathname));
+            fileInput.nextLine(); //ignore first line
+            while (fileInput.hasNextLine()) {
+                thisLine = fileInput.nextLine();
+                Pattern regex = Pattern.compile("(\\d+(?:\\.\\d+)?)"); //digits and decimals followed by digits
+                Matcher matcher = regex.matcher(thisLine);
+                System.out.println(thisLine);
+                int i = 0;
+                double x = 0;
+                double y = 0;
+                int clusterGroup = 0;
+                while (matcher.find()) {
+                    try {
+                        if (i == 0) {
+                            x = Double.valueOf(matcher.group(1));
+                            i=1;
+                        } else if (i == 1) {
+                            y = Double.valueOf(matcher.group(1));
+                            i=2;
+                        } else if (i == 2) {
+                            clusterGroup = Integer.valueOf(matcher.group(1));
+                            i=0;
+                            System.out.println("x=" + x + " y=" + y + " cg=" + clusterGroup);
+                        } else {
+                            System.out.println("An error occurred while processing x and y from cluster.txt");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("NumberFormatException: " + e);
+                    }
+
+                }
+                clusterList.addNode(x, y, clusterGroup);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("FileNotFoundException error: " + e);
+        }
+        return clusterList;
     }
 
 
