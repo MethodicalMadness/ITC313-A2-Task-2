@@ -1,4 +1,4 @@
-package sample;
+package task2;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -69,7 +69,7 @@ public class Main extends Application {
         }
         chart.getData().addAll(cluster1, cluster2, cluster3, cluster4);
         Scene scene = new Scene(chart, 1000, 1000);
-        scene.getStylesheets().add("sample/Chart.css");
+        scene.getStylesheets().add("task2/Chart.css");
         primaryStage.setScene(scene);
         primaryStage.show();
     }

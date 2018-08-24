@@ -1,4 +1,4 @@
-package sample;
+package task2;
 
 /**
  * Node class for LinkedList
