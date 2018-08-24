@@ -12,8 +12,19 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Main class for displaying the cluster chart
+ * @author Michael Coleman
+ */
 public class Main extends Application {
 
+    /**
+     * Initializes the chart
+     * Sets the series data for chart
+     * Displays the chart
+     * @param primaryStage
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         LinkedList clusterList = processClusterTxt();
@@ -63,6 +74,10 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Processes the cluster.txt
+     * @return LinkedList whose Nodes contain the x,y coords for the chart and cluster group
+     */
     public static LinkedList processClusterTxt() {
         LinkedList clusterList = new LinkedList();
         String pathname = "cluster.txt";
@@ -101,13 +116,17 @@ public class Main extends Application {
                 System.out.println("node:" + j + " x=" + x + " y=" + y + " c=" + c);
                 j++;
             }
+            fileInput.close();
         } catch (FileNotFoundException e) {
             System.out.println("FileNotFoundException error: " + e);
         }
         return clusterList;
     }
 
-
+    /**
+     * main
+     * @param args
+     */
     public static void main(String[] args) {
         launch(args);
     }
